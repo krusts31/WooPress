@@ -73,33 +73,17 @@ RUN apk add --no-cahce php83-ctype\
 	phpunit\
 	openssh-client
 
-COPY --chown=nginx:nginx init-scripts/plugin-dev-install.sh /tmp/plugin-dev-install.sh
-
-CMD sh /tmp/plugin-dev-install.sh
-
-FROM base as store-dev
-
-COPY --chown=nginx:nginx init-scripts/store-wordpress-install.sh /tmp/store-wordpress-install.sh
-
-CMD sh /tmp/store-wordpress-install.sh
-
-FROM base as blog-dev
-
-COPY --chown=nginx:nginx init-scripts/blog-wordpress-install.sh /tmp/blog-wordpress-install.sh
-
-CMD sh /tmp/blog-wordpress-install.sh
-
-FROM base as single-site-dev
-
-COPY --chown=nginx:nginx init-scripts/core-wordpress-install.sh /tmp/core-wordpress-install.sh
-
-CMD sh /tmp/core-wordpress-install.sh
-
 FROM base as multi-site-dev
 
 RUN apk add vim --no-cache
 
 COPY --chown=nginx:nginx init-scripts/multi-site-dev-wordpress-install.sh /tmp/multi-site-wordpress-install.sh
+
+CMD sh /tmp/multi-site-wordpress-install.sh
+
+FROM base as multi-site-staging
+
+COPY --chown=nginx:nginx init-scripts/multi-site-prod-wordpress-install.sh /tmp/multi-site-wordpress-install.sh
 
 CMD sh /tmp/multi-site-wordpress-install.sh
 

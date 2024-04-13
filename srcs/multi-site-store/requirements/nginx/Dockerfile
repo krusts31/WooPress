@@ -15,18 +15,6 @@ COPY --chown=nginx:nginx conf/nginx.conf /etc/nginx/nginx.conf
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
 
-FROM base as store-dev
-
-COPY --chown=nginx:nginx conf/blog.conf /etc/nginx/http.d/store.conf
-
-FROM base as blog-dev
-
-COPY --chown=nginx:nginx conf/blog.conf /etc/nginx/http.d/blog.conf
-
-FROM base as single-site-dev
-
-COPY --chown=nginx:nginx conf/prod.conf /etc/nginx/http.d/prod.conf
-
 FROM base as multi-site-dev
 
 COPY --chown=nginx:nginx conf/wordpress-multi-site-dev.conf /etc/nginx/http.d/wordpress-multi-site-dev.conf
