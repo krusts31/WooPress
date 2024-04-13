@@ -1,22 +1,22 @@
-up-store-dev:
-	bash ./srcs/requirements/single-site-store/certbot/init-letsencrypt.sh store-dev.com
-	docker compose -f srcs/single-site-store/docker-compose-store-dev.yaml\
-		--env-file srcs/signle-site-store/.env-store-dev up --build
+up-dev:
+	bash ./srcs/single-site-store/requirements/certbot/init-letsencrypt.sh stroe-dev.com
+	docker compose -f srcs/single-site-store/docker-compose-dev.yaml\
+		--env-file srcs/single-site-store/.env-dev up --build
 
-down-store-dev:
-	docker compose -f srcs/signle-site-store/docker-compose-store-dev.yaml\
-		--env-file srcs/signle-site-store/.env-store-dev -v down
+down-dev:
+	docker compose -f srcs/single-site-store/docker-compose-dev.yaml\
+		--env-file srcs/single-site-store/.env-dev -v down
 	docker volume rm srcs_vol_mariadb srcs_vol_wordpress
 
 up-multi-dev:
-	bash ./srcs/requirements/certbot/init-letsencrypt.sh\
+	bash ./srcs/single-site-store/requirements/certbot/init-letsencrypt.sh\
 		bio113-dev.com lt.bio113-dev.com et.bio113-dev.com\
 		lv.bio113-dev.com de.bio113-dev.com files.bio113-dev.com
 	docker compose -f srcs/multi-site-store/docker-compose-multi-site-dev.yaml\
 		--env-file srcs/.env-dev up --build
 
 up-multi-prod:
-	bash ./srcs/requirements/certbot/init-letsencrypt.sh\
+	bash ./srcs/single-site-store/requirements/certbot/init-letsencrypt.sh\
 		olgrounds.dev lt.olgrounds.dev et.olgrounds.dev\
 		lv.olgrounds.dev de.olgrounds.dev files.olgrounds.dev
 	docker compose -f srcs/multi-site-store/docker-compose-multi-site-prod.yaml\

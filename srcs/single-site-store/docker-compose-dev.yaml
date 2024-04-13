@@ -16,7 +16,7 @@ services:
       wordpress:
         condition: service_healthy
     networks:
-      - dome-net
+      - store-net
     ports:
       - "443:443"
       - "80:80"
@@ -47,7 +47,7 @@ services:
     volumes:
       - vol_wordpress:/var/www/wordpress/:delegated
     networks:
-      - dome-net
+      - store-net
     environment:
       WORDPRESS_URL:             ${WORDPRESS_URL}
       WORDPRESS_TITLE:           ${WORDPRESS_TITLE}
@@ -80,7 +80,7 @@ services:
     volumes:
       - vol_mariadb:/var/lib/mysql/:delegated
     networks:
-      - dome-net
+      - store-net
     environment:
       MARIADB_USER:              ${MARIADB_USER}
       MARIADB_USER_PASSWORD:     ${MARIADB_USER_PASSWORD}
@@ -96,9 +96,9 @@ services:
 
 
 networks:
-  dome-net:
+  store-net:
     driver: bridge
-    name: dome-net
+    name: store-net
 
 volumes:
   vol_wordpress:
