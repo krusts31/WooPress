@@ -1,0 +1,8 @@
+.DS_Store
+/nbproject
+/*.zip
+*/var/
+*/locations.json
+*/languages/*.pot~
+*/languages/*.po~
+*/languages/*.mo~

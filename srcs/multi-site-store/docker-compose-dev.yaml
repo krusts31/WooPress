@@ -1,0 +1,105 @@
+version: '2.4'
+
+services:
+
+  nginx:
+    restart: on-failure
+    container_name: nginx
+    build:
+      context: ./requirements/nginx
+      dockerfile: Dockerfile
+      target: multi-site-dev
+    hostname: nginx
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      wordpress:
+        condition: service_healthy
+    networks:
+      - dome-net
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - vol_wordpress:/var/www/wordpress/:delegated
+      - ./requirements/certbot/conf:/etc/letsencrypt #this is for the config files
+      - ./requirements/certbot/www:/var/www/certbot  #this is for the lets encrypt challange
+      - ./requirements/nginx/pictures:/var/www/pictures
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      WORDPRESS_URL:             ${WORDPRESS_URL}
+
+  wordpress:
+    restart: on-failure
+    build:
+      context: ./requirements/wordpress
+      dockerfile: Dockerfile
+      target: multi-site-dev
+    container_name: wordpress
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    hostname: wordpress
+    volumes:
+      - vol_wordpress:/var/www/wordpress/:delegated
+    networks:
+      - dome-net
+    environment:
+      WORDPRESS_URL:             ${WORDPRESS_URL}
+      WORDPRESS_TITLE:           ${WORDPRESS_TITLE}
+      WORDPRESS_ADMIN:           ${WORDPRESS_ADMIN}
+      WORDPRESS_ADMIN_PASSWORD:  ${WORDPRESS_ADMIN_PASSWORD}
+      WORDPRESS_ADMIN_EMAIL:     ${WORDPRESS_ADMIN_EMAIL}
+      WORDPRESS_DATABASE_NAME:   ${WORDPRESS_DATABASE_NAME}
+      WORDPRESS_USER:            ${WORDPRESS_USER}
+      WORDPRESS_USER_EMAIL:      ${WORDPRESS_USER_EMAIL}
+      WORDPRESS_USER_ROLE:       ${WORDPRESS_USER_ROLE}
+      WORDPRESS_USER_PASSWORD:   ${WORDPRESS_USER_PASSWORD}
+      MARIADB_USER:              ${MARIADB_USER}
+      MARIADB_USER_PASSWORD:     ${MARIADB_USER_PASSWORD}
+      MARIADB_ROOT_PASSWORD:     ${MARIADB_ROOT_PASSWORD}
+      MARIADB_HOST_NAME:         ${MARIADB_HOST_NAME}
+    healthcheck:
+      test: ["CMD", "/tmp/healthcheck.sh"]
+      interval: 5s
+      timeout: 50s
+      retries: 5
+
+  mariadb:
+    restart: on-failure
+    container_name: mariadb
+    hostname: mariadb
+    build:
+      context: ./requirements/mariadb
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - vol_mariadb:/var/lib/mysql/:delegated
+    networks:
+      - dome-net
+    environment:
+      MARIADB_USER:              ${MARIADB_USER}
+      MARIADB_USER_PASSWORD:     ${MARIADB_USER_PASSWORD}
+      WORDPRESS_DATABASE_NAME:   ${WORDPRESS_DATABASE_NAME}
+      MARIADB_ROOT_PASSWORD:     ${MARIADB_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent", "-uroot", "-p${MARIADB_ROOT_PASSWORD}"]
+      interval: 5s
+      retries: 5
+      start_period: 5s
+
+
+networks:
+  dome-net:
+    driver: bridge
+    name: dome-net
+
+volumes:
+  vol_wordpress:
+  vol_mariadb:
